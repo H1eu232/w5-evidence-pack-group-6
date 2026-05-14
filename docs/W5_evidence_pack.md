@@ -29,7 +29,7 @@
 
 ### 2.2 Architecture Diagram 
 
-![Architecture diagram W5](./docs/images/ArchitectureDiagram.png)
+![Architecture diagram W5](./images/architecturediagram.png)
 
 ---
 
