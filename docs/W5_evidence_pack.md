@@ -107,7 +107,13 @@ curl -v http://10.20.11.96:8000
 ```
 
 ![Connectivity test](./images/TestConnection.png)
-<sub>Note: Output xác nhận traffic cross-VPC đang chảy đúng — response trả về từ instance/service bên VPC kia.</sub>
+
+**note:**
+`Kiểm tra kết nối thực tế từ Bastion Host (Management VPC) tới App (Prod VPC). Trạng thái HTTP 404 xác nhận lớp Network đã thông suốt (Reachability OK).`
+
+**Result:**
+
+![Result test](./images/ResultTest.png)
 
 ---
 
