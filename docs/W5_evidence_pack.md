@@ -125,14 +125,6 @@
 ![Firewall route table](./images/w5-firewall-route-table.png)
 <sub>Note: Route table cập nhật — traffic đi qua firewall endpoint trước khi ra NAT Gateway.</sub>
 
-**Nếu Path B — Hardened SG + NACL:**
-
-![SG inbound rules cleaned](./images/w5-sg-cleaned.png)
-<sub>Note: Đã xóa mọi rule inbound 0.0.0.0/0 trên port 22/3389. Giải thích thay bằng rule gì.</sub>
-
-![NACL deny rule](./images/w5-nacl-deny.png)
-<sub>Note: NACL DENY rule rõ ràng — deny traffic gì, từ đâu, tại sao rule này cần thiết.</sub>
-
 ---
 
 ### 4.3 Request được cho phép (ACCEPT)
