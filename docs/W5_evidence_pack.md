@@ -9,8 +9,8 @@
 |---|---|
 | **Group Number** | Group 6 |
 | **Member Names** | Minh Tuấn · Thành Vinh · Anh Hoàng · Hoàng Nhân · Mạnh Khang · Ngọc Thắng · Hoàng Thông · Thành Tâm |
-| **Link Repo** | `[GitHub repo URL]` |
-| **W4 Evidence Pack** | `[Link tới docs/W4_evidence.md commit]` |
+| **W5 Repo** | `[[GitHub G6 repo URL]](https://github.com/H1eu232/w5-evidence-pack-group-6.git)` |
+
 
 ---
 
@@ -27,10 +27,9 @@
 
 ---
 
-### 2.2 Architecture Diagram (khớp với những gì đang deploy)
+### 2.2 Architecture Diagram 
 
-![Architecture diagram W5](./images/w5-architecture-diagram.png)
-<sub>Note: Diagram phản ánh đúng những gì đang chạy trên AWS console — không có tầng vẽ mà chưa deploy, không có tầng deploy mà chưa vẽ.</sub>
+![Architecture diagram W5](./images/ArchitectureDiagram.png)
 
 ---
 
