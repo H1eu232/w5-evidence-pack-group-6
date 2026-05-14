@@ -121,18 +121,15 @@ curl -v http://10.20.11.96:8000
 
 ### 3.4 VPC Flow Logs — Bật và có sample entry
 
-![Flow logs enabled](./images/w5-flow-logs-enabled.png)
-<sub>Note: VPC Flow Logs đã bật, publish về CloudWatch Logs hoặc S3. Giải thích chọn destination nào và tại sao.</sub>
+![Flow logs (App tier)](./images/VPCflowlog.png)
 
-**Sample Flow Log entry:**
+**note:**
+`Flow Logs tại Prod VPC hiển thị trạng thái 'ACCEPT OK' cho lưu lượng đến từ IP 10.0.0.208 của Management VPC.`
 
-```
-[Paste sample log entry ở đây]
-# e.g.
-# 2 123456789012 eni-xxxx 10.0.1.5 10.1.0.10 443 55234 6 10 840 ACCEPT OK
-```
+![Flow logs (Management tier](./images/VPCflowlog2.png)
 
-<sub>Note: Giải thích entry này nói lên điều gì — source IP, dest IP, port, action ACCEPT/REJECT.</sub>
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
 
 ---
 
@@ -140,7 +137,7 @@ curl -v http://10.20.11.96:8000
 
 ### 4.1 Lựa chọn Path
 
-**Path đã chọn:** `[ ] Path A — AWS Network Firewall` &nbsp;&nbsp; `[ ] Path B — Hardened SG + NACL`
+**Path đã chọn:** `[ ] Path A — AWS Network Firewall`
 
 **Rationale:**
 `[Nếu Path A: giải thích Lambda/EC2 nào ra internet qua NAT Gateway và tại sao cần firewall.]`
