@@ -44,6 +44,7 @@
 ### 2.4 Bedrock Retrieval vẫn hoạt động
 
 ![Bedrock retrieval](./images/BedrockRetrieval.png)
+
 **note:**
 `Lambda invoke Bedrock KB, trả về câu trả lời đúng với source citation.`
 
@@ -67,7 +68,7 @@
 `Lí do: Hệ thống hiện tại có hai VPC với dải CIDR không chồng lấn (10.0.0.0/18 và 10.20.0.0/16). VPC Peering là giải pháp tối ưu nhất về chi phí và hiệu năng cho kết nối point-to-point trực tiếp, cho phép Bastion Host từ Management VPC có thể truy cập và quản trị các dịch vụ trong môi trường Production một cách bảo mật qua đường mạng nội bộ của AWS.`
 
 **Peering Connection**
-![Route table](./images/PeeringConnection.png)
+![Route table](./images/peeringconnection.png)
 
 **2 VPC**
 ![Route table](./images/2VPC.png)
@@ -81,14 +82,17 @@
 ### 3.2 Route Table 
 
 ![Route table private subnet a (Production VPC)](./images/Rtb_ps_a_ProductionVPC.png)
+
 **note:**
 `Cấu hình Route Table tại Private Subnet A (Prod VPC), điều hướng traffic đến Management VPC qua Peering Connection (pcx-0767...).`
 
 ![Route table private subnet b (Production VPC)](./images/Rtb_ps_b_ProductionVPC.png)
+
 **note:**
 `Đảm bảo tính Multi-AZ bằng việc cập nhật Route Table tại Private Subnet B trỏ về Management VPC qua Peering.`
 
 ![Route table public subnet (Management VPC)](./images/Rtb_ManagementVPC.png)
+
 **note:**
 `Cấu hình Route Table tại Management VPC trỏ ngược về dải IP 10.20.0.0/16 của Prod VPC để hoàn tất kết nối 2 chiều.`
 
