@@ -29,9 +29,7 @@
 
 ### 2.2 Architecture Diagram 
 
-
-![Architecture diagram W5](./images/ArchitectureDiagram.png)
-<sub>Note: Mô tả request đi qua những bước nào, kết quả trả về là gì.</sub>
+![Architecture diagram W5](./docs/images/ArchitectureDiagram.png)
 
 ---
 
