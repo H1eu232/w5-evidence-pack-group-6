@@ -29,6 +29,7 @@
 
 ### 2.2 Architecture Diagram 
 
+
 ![Architecture diagram W5](./images/ArchitectureDiagram.png)
 
 
