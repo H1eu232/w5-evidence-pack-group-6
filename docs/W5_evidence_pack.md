@@ -43,7 +43,7 @@
 
 ### 2.4 Bedrock Retrieval vẫn hoạt động
 
-![Bedrock retrieval](./images/w5-bedrock-retrieval.png)
+![Bedrock retrieval](./images/BedrockRetrieval.png)
 <sub>Note: Lambda invoke Bedrock KB, trả về câu trả lời đúng với source citation.</sub>
 
 ---
