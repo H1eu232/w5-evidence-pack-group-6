@@ -68,9 +68,11 @@
 `Lí do: Hệ thống hiện tại có hai VPC với dải CIDR không chồng lấn (10.0.0.0/18 và 10.20.0.0/16). VPC Peering là giải pháp tối ưu nhất về chi phí và hiệu năng cho kết nối point-to-point trực tiếp, cho phép Bastion Host từ Management VPC có thể truy cập và quản trị các dịch vụ trong môi trường Production một cách bảo mật qua đường mạng nội bộ của AWS.`
 
 **Peering Connection**
+
 ![Route table](./images/peeringconnection.png)
 
 **2 VPC**
+
 ![Route table](./images/2VPC.png)
 
 **note:**
