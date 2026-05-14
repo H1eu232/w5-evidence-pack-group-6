@@ -31,6 +31,7 @@
 
 ![Architecture diagram W5](./images/ArchitectureDiagram.png)
 
+
 ---
 
 ### 2.3 W4 Feedback Resolution
