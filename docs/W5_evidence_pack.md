@@ -44,7 +44,8 @@
 ### 2.4 Bedrock Retrieval vẫn hoạt động
 
 ![Bedrock retrieval](./images/BedrockRetrieval.png)
-<sub>Note: Lambda invoke Bedrock KB, trả về câu trả lời đúng với source citation.</sub>
+**note:**
+`Lambda invoke Bedrock KB, trả về câu trả lời đúng với source citation.`
 
 ---
 
@@ -59,29 +60,49 @@
 
 ### 3.1 Lựa chọn Path
 
-**Path đã chọn:** `[ ] Path A — VPC Peering` &nbsp;&nbsp; `[ ] Path B — Transit Gateway` &nbsp;&nbsp; `[ ] Path C — Justified Single-VPC`
+**Path đã chọn:** `Path A — VPC Peering`
 
 **Rationale:**
-`[Giải thích cụ thể tại sao chọn path này cho ứng dụng — không phải câu chữ chung chung.`
-`Nếu Path C: phải giải thích (a) vì sao single-VPC phù hợp, (b) event nào sẽ trigger thêm VPC thứ hai.]`
+`Nhóm chọn Path A — VPC Peering để kết nối giữa Management VPC và hexacode-prod-vpc`
+`Lí do: Hệ thống hiện tại có hai VPC với dải CIDR không chồng lấn (10.0.0.0/18 và 10.20.0.0/16). VPC Peering là giải pháp tối ưu nhất về chi phí và hiệu năng cho kết nối point-to-point trực tiếp, cho phép Bastion Host từ Management VPC có thể truy cập và quản trị các dịch vụ trong môi trường Production một cách bảo mật qua đường mạng nội bộ của AWS.`
+
+**Peering Connection**
+![Route table](./images/PeeringConnection.png)
+
+**2 VPC**
+![Route table](./images/2VPC.png)
+
+**note:**
+`Xác nhận cấu hình 2 VPC riêng biệt (Management & Production) với dải CIDR không trùng lặp (10.0.0.0/18 và 10.20.0.0/16) sẵn sàng cho kết nối Peering.`
+
 
 ---
 
-### 3.2 Route Table (cả hai bên nếu Peering / TGW route table nếu TGW)
+### 3.2 Route Table 
 
-![Route table](./images/w5-route-table.png)
-<sub>Note: Route table show traffic cross-VPC đi đúng target (pcx-XXXX hoặc tgw-XXXX). Giải thích tại sao route này được thêm vào.</sub>
+![Route table private subnet a (Production VPC)](./images/Rtb_ps_a_ProductionVPC.png)
+**note:**
+`Cấu hình Route Table tại Private Subnet A (Prod VPC), điều hướng traffic đến Management VPC qua Peering Connection (pcx-0767...).`
+
+![Route table private subnet b (Production VPC)](./images/Rtb_ps_b_ProductionVPC.png)
+**note:**
+`Đảm bảo tính Multi-AZ bằng việc cập nhật Route Table tại Private Subnet B trỏ về Management VPC qua Peering.`
+
+![Route table public subnet (Management VPC)](./images/Rtb_ManagementVPC.png)
+**note:**
+`Cấu hình Route Table tại Management VPC trỏ ngược về dải IP 10.20.0.0/16 của Prod VPC để hoàn tất kết nối 2 chiều.`
 
 ---
 
 ### 3.3 Connectivity Test (curl hoặc ping cross-VPC)
 
 ```bash
-# Paste lệnh test ở đây
-# e.g. curl http://10.1.0.x:8080/health  hoặc  ping 10.1.0.x
+curl -v http://10.20.11.96:8000
+10.20.11.96: Private IP của identity-service 
+8000: port
 ```
 
-![Connectivity test](./images/w5-connectivity-test.png)
+![Connectivity test](./images/TestConnection.png)
 <sub>Note: Output xác nhận traffic cross-VPC đang chảy đúng — response trả về từ instance/service bên VPC kia.</sub>
 
 ---
