@@ -53,7 +53,30 @@
 
 ---
 
-### 2.5 Database Query vẫn hoạt động
+### 2.5 Auto sync knowledge base
+![Lambda-func](./images/lambda-func.png)
+
+**note:**
+`Code = python để auto sync.`
+
+![problem-bucket](./images/problem-bucket.png)
+
+**note:**
+`Các problem hiện tại có trong bucket`
+
+![problem-bucket-after](./images/bucket-after.png)
+
+**note:**
+`Sau khi upload 2 new problem statement`
+
+![auto-sync](./images/auto-sync.png)
+
+**note:**
+`bedrock knowledgebase auto sync success`
+
+---
+
+### 2.6 Database Query vẫn hoạt động
 
 ![Database query](./images/w5-db-query.png)
 <sub>Note: Query chạy được trên RDS, trả về data thật.</sub>
