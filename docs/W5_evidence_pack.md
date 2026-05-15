@@ -92,7 +92,7 @@
 
 **2 VPC**
 
-![Route table](./images/2VPC.png)
+![Route table](./images/vpc2.png)
 
 **note:**
 `Xác nhận cấu hình 2 VPC riêng biệt (Management & Production) với dải CIDR không trùng lặp (10.0.0.0/18 và 10.20.0.0/16) sẵn sàng cho kết nối Peering.`
@@ -380,14 +380,28 @@ curl -v http://10.20.11.96:8000
 
 ## 8. Negative Security Tests
 
-### 8.2 EFS — Truy cập từ instance không thuộc app-tier SG bị từ chối
 
-![EFS access denied](./images/w5-efs-access-denied.png)
-<sub>Note: Mount NFS từ instance ngoài app-tier SG → Connection timed out. Xác nhận EFS mount target SG đang enforce đúng.</sub>
+  ### 8.1 EFS — Truy cập từ instance không thuộc app-tier SG bị từ chối
 
+  ![EC2 instance not in app-tier security group](./images/8.2-1_-ec2-not-belong-to-apptier-sg-config.png)
+
+  **note:**
+  `EC2 dùng để kiểm thử không thuộc App Tier Security Group, tạo điều kiện negative test cho rule giới hạn truy cập EFS.`
+
+  ![EFS DNS endpoint](./images/8.2-1_-efs-dns.png)
+
+  **note:**
+  `Xác định DNS endpoint của EFS để thử truy cập từ instance không được cấp quyền.`
+
+  ![Scan EFS from unauthorized EC2 failed](./images/8.2-1_-try-to-scan-efs-from-that-ec2.png)
+
+  **note:**
+  `Kết quả scan/truy cập EFS từ EC2 không thuộc App Tier Security Group bị từ chối, xác nhận EFS mount target SG enforce đúng nguyên tắc least privilege.`
+
+  ---
 ---
 
-### 8.3 API Gateway — Unauthenticated request bị từ chối
+### 8.2 API Gateway — Unauthenticated request bị từ chối
 
   ![Unauthenticated request denied on frontend](./images/8.3-deny-unauthorized-frontend.png)
 
@@ -400,5 +414,27 @@ curl -v http://10.20.11.96:8000
   `Log ghi nhận request unauthorized bị deny, cung cấp bằng chứng negative security test cho API Gateway.`
 
 ---
+
+9. Stretch Goals (Tùy chọn)
+Chỉ điền nếu đã hoàn tất cả 5 must-haves và Evidence Pack.
+
+9.1 [ ] VPC Reachability Analyzer
+-> chưa có
+
+9.2 [ ] Backup Vault Lock
+-> chưa có
+
+9.3 [ ] Lambda Power Tuning
+-> chưa có
+
+9.4 [ ] API Gateway Custom Domain
+-> đang chờ được duyệt
+
+9.5 [ ] CloudFormation Template cho một resource W5
+
+github: https://github.com/pho-veteran/hexacode/blob/main/terraform/main.tf
+
+![alt text](./images/terraform.png)
+![alt text](image-1.png)
 
 *— End of W5 Evidence Pack —*
