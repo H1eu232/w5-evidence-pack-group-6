@@ -286,7 +286,7 @@ curl -v http://10.20.11.96:8000
 
 ### 7.1 Pattern đã chọn
 
-**Pattern:** `[ ] Reserved Concurrency` &nbsp;&nbsp; `[ ] Provisioned Concurrency`
+**Pattern:** `Reserved Concurrency` &nbsp;&nbsp; `Provisioned Concurrency`
 
 **Function áp dụng:** `hexacode-prod-chat`
 
