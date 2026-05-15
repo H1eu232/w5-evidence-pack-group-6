@@ -20,8 +20,7 @@
 
 **Action demo:** `[e.g. User gửi câu hỏi qua chat widget → Lambda xử lý → Bedrock trả lời]`
 
-![alt text](./images/image.png)
-<sub>Note: Mô tả request đi qua những bước nào, kết quả trả về là gì.</sub>
+Nhóm 6 sẽ present trước mentor :>
 
 ---
 
