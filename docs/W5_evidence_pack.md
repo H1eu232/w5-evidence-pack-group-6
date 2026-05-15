@@ -151,12 +151,12 @@ curl -v http://10.20.11.96:8000
 **note:**
 `Thiết lập Route Table riêng cho Firewall Subnet tại AZ1, điều hướng traffic 0.0.0.0/0 tới NAT Gateway để đảm bảo mọi luồng traffic đi ra internet đều phải đi qua chốt kiểm soát.`
 
-![Subnet Application Route Table (no NAT gateway)](./imagesRtbofSubnetApplication.png)
+![Subnet Application Route Table (no NAT gateway)](./images/RtbofSubnetApplication.png)
 
 **note:**
 `Cấu hình Route Table cho tầng Application, sử dụng VPC Peering cho traffic nội bộ và VPC Endpoints để truy cập các dịch vụ AWS một cách bảo mật.`
 
-![Log](./Result.png)
+![Log](./images/Result.png)
 
 **note:**
 `CloudWatch Logs ghi nhận chi tiết hành động (Action: Allowed) và thông tin IP nguồn/đích của traffic đi qua Firewall, đảm bảo tính Observability.`
