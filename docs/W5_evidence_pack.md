@@ -16,8 +16,6 @@
 
 ## 2. Application Carry-Forward Verification
 
-> Trainer verify phần này đầu tiên. Phải có đủ 3 mục bên dưới.
-
 ### 2.1 App chạy end-to-end
 
 **Action demo:** `[e.g. User gửi câu hỏi qua chat widget → Lambda xử lý → Bedrock trả lời]`
@@ -129,7 +127,7 @@ curl -v http://10.20.11.96:8000
 ![Flow logs (Management tier](./images/VPCflowlog2.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính Observability của Network Fortress.`
 
 ---
 
@@ -137,37 +135,49 @@ curl -v http://10.20.11.96:8000
 
 ### 4.1 Lựa chọn Path
 
-**Path đã chọn:** `[ ] Path A — AWS Network Firewall`
+**Path đã chọn:** `Path A — AWS Network Firewall`
 
 **Rationale:**
 `[Nếu Path A: giải thích Lambda/EC2 nào ra internet qua NAT Gateway và tại sao cần firewall.]`
-`[Nếu Path B: giải thích (a) vì sao egress firewall không cần cho topology này, (b) traffic nào sẽ đòi deploy nó trong production.]`
 
 ---
 
-### 4.2 Cấu hình Firewall / Hardened SG+NACL
+### 4.2 Cấu hình Firewall 
 
-**Nếu Path A — Network Firewall:**
+**Path A — Network Firewall:**
 
-![Firewall rule group](./images/w5-firewall-rule-group.png)
-<sub>Note: Stateful rule group — domain allowlist hoặc IPS signature. Giải thích rule này block/allow traffic gì và tại sao chọn rule này.</sub>
+![Subnet Firewall Route Table -> NAT gateway](./images/RtbofSubnetFirewall.png)
 
-![Firewall route table](./images/w5-firewall-route-table.png)
-<sub>Note: Route table cập nhật — traffic đi qua firewall endpoint trước khi ra NAT Gateway.</sub>
+**note:**
+`Thiết lập Route Table riêng cho Firewall Subnet tại AZ1, điều hướng traffic 0.0.0.0/0 tới NAT Gateway để đảm bảo mọi luồng traffic đi ra internet đều phải đi qua chốt kiểm soát.`
+
+![Subnet Application Route Table (no NAT gateway)](./imagesRtbofSubnetApplication.png)
+
+**note:**
+`Cấu hình Route Table cho tầng Application, sử dụng VPC Peering cho traffic nội bộ và VPC Endpoints để truy cập các dịch vụ AWS một cách bảo mật.`
+
+![Log](./Result.png)
+
+**note:**
+`CloudWatch Logs ghi nhận chi tiết hành động (Action: Allowed) và thông tin IP nguồn/đích của traffic đi qua Firewall, đảm bảo tính Observability.`
 
 ---
 
 ### 4.3 Request được cho phép (ACCEPT)
 
 ![Request allowed](./images/w5-request-allowed.png)
-<sub>Note: Flow Log hoặc Firewall Alert Log cho thấy request hợp lệ được ACCEPT — source, destination, port.</sub>
+
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
 
 ---
 
 ### 4.4 Negative Test — Request bị chặn (DENY/REJECT)
 
 ![Request blocked](./images/w5-request-blocked.png)
-<sub>Note: Screenshot kết nối bị từ chối — lỗi Connection timed out hoặc Connection refused. Xác nhận firewall/NACL/SG đang ép buộc đúng rule.</sub>
+
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
 
 ---
 
@@ -175,94 +185,99 @@ curl -v http://10.20.11.96:8000
 
 ### 5.1 EFS File System — Đã tạo và mount
 
-![EFS file system](./images/w5-efs-filesystem.png)
-<sub>Note: EFS file system đã tạo, mount target trong private application subnet. Giải thích app dùng EFS để lưu loại file gì (upload chung, session token, model artifact, v.v.).</sub>
+![Attack EFS](./images/AttackEFS.png)
 
-![EFS security group](./images/w5-efs-sg.png)
-<sub>Note: Security Group của mount target chỉ allow inbound NFS (port 2049) từ SG của app tier — không phải 0.0.0.0/0.</sub>
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+
+![SG của mount target chỉ allow từ SG app tier](./images/EFS_mount_SG.png)
+
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
 
 ---
 
-### 5.2 Ghi và đọc file từ EFS mount path
+### 5.2 Resource Assignment for Backup
 
-```bash
-# Paste lệnh ghi và đọc file ở đây
-# e.g.
-# echo "test-content" > /mnt/efs/app/testfile.txt
-# cat /mnt/efs/app/testfile.txt
-```
+![Resource Assignment](./images/ResourceAssignment.png)
 
-![EFS write read](./images/w5-efs-write-read.png)
-<sub>Note: Chạy trên instance trong private subnet. File ghi vào EFS đọc lại được — xác nhận shared storage hoạt động đúng.</sub>
+**note:**
+`Nhóm dùng ECS Fargate là Serverless nên không có EBS`
 
 ---
 
 ### 5.3 AWS Backup Plan
 
-![Backup plan](./images/w5-backup-plan.png)
-<sub>Note: Backup plan có schedule (daily), retention (7+ ngày), backup vault. Bao trùm ít nhất 3 resource: EFS, RDS (W3), EBS (W2).</sub>
+![Schedule](./images/Schedule.png)
 
-![Backup vault](./images/w5-backup-vault.png)
-<sub>Note: Backup vault và recovery points đã tạo — ít nhất 1 recovery point Completed.</sub>
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+
+![Recovery Point](./images/RecoveryPoint.png)
+
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
 
 ---
 
-### 5.4 Restore Test — Bắt buộc
+### 5.4 Restore Test 
 
-![Restore job completed](./images/w5-restore-completed.png)
-<sub>Note: Restore job status: Completed. Ghi lại thời gian restore bắt đầu và kết thúc.</sub>
+![File Test](./images/AddfileTest.png)
 
-![Restore data verified](./images/w5-restore-data.png)
-<sub>Note: Connect vào resource đã khôi phục, đọc lại data đã biết và xác nhận có ở đó. Đây là bằng chứng backup thực sự chạy được — không chỉ tồn tại.</sub>
+**note:**
+`Add thêm file (Noise_testing.txt) vào EFS sau khi đặt Recovery point`
+
+![Trigger Restore](./images/TriggerRestore.png)
+
+**note:**
+`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+
+![Mount EFS from back up](./images/MountEFSfromBackup2.png)
+![Mount EFS from back up](./images/MountEFSfromBackup2.png)
+
+**note:**
+`Mount EFS mới từ Backup → không có file Noise_testing + còn các data cũ`
 
 ---
 
 ## 6. MH4 — API Gateway trước Lambda
 
-### 6.1 API Gateway Resource Tree
+### 6.1 Throttling — Usage Plan với Rate Limit
 
-![API gateway resource](./images/w5-apigw-resource.png)
-<sub>Note: Cây resource của API — routes, methods, Lambda Proxy Integration. Giải thích chọn REST API hay HTTP API và tại sao (trade-off auth method).</sub>
+![Usage Plan + Throttling](./images/UsagePlan.png)
 
----
-
-### 6.2 Throttling — Usage Plan với Rate Limit
-
-![Throttling config](./images/w5-apigw-throttling.png)
-<sub>Note: Usage plan cấu hình rate limit (requests/giây) và burst limit. Giải thích chọn giá trị này dựa trên workload ứng dụng.</sub>
+**note:**
+`Usage plan có rate + burst throttling`
 
 ---
 
-### 6.3 Authentication Configuration
+### 6.2 Authentication Configuration
 
-**Auth method đã chọn:** `[ ] API Key` &nbsp;&nbsp; `[ ] Lambda Authorizer` &nbsp;&nbsp; `[ ] Cognito User Pool Authorizer`
+**Auth method đã chọn:** `Cognito User Pool Authorizer`
 
-![Auth config](./images/w5-apigw-auth.png)
-<sub>Note: Cấu hình auth đang active trên route. Giải thích tại sao chọn method này thay vì các option khác.</sub>
+![Auth config](./images/AuthenticatewithCognito.png)
 
----
-
-### 6.4 Test curl — Authenticated (200)
-
-```bash
-# Paste lệnh curl với auth ở đây
-# e.g. curl -H "x-api-key: YOUR_KEY" https://xxxx.execute-api.ap-southeast-1.amazonaws.com/prod/chat
-```
-
-![curl 200](./images/w5-curl-200.png)
-<sub>Note: Request có auth hợp lệ → HTTP 200, response body từ Lambda.</sub>
+**note:**
+`Người dùng đăng nhập thành công vào hệ thống Hexacode thông qua Cognito User Pool để lấy Identity Token.`
 
 ---
 
-### 6.5 Test curl — Unauthenticated (403)
+### 6.3 Before Login
 
-```bash
-# Paste lệnh curl không có auth ở đây
-# e.g. curl https://xxxx.execute-api.ap-southeast-1.amazonaws.com/prod/chat
-```
+![Before login](./images/Notlogin.png)
 
-![curl 403](./images/w5-curl-403.png)
-<sub>Note: Request không có auth → HTTP 403 Forbidden. Xác nhận API Gateway đang enforce auth đúng.</sub>
+**note:**
+`Usage plan có rate + burst throttling`
+
+---
+
+### After Login
+
+![After login](./images/Login.png)
+![After login](./images/Login2.png)
+
+**note:**
+`Usage plan có rate + burst throttling`
 
 ---
 
@@ -270,7 +285,7 @@ curl -v http://10.20.11.96:8000
 
 ### 7.1 Pattern đã chọn
 
-**Pattern:** `[ ] Reserved Concurrency` &nbsp;&nbsp; `[ ] Provisioned Concurrency` &nbsp;&nbsp; `[ ] Async + DLQ` &nbsp;&nbsp; `[ ] S3-Event-Triggered Lambda`
+**Pattern:** `[ ] Reserved Concurrency` &nbsp;&nbsp; `[ ] Provisioned Concurrency`
 
 **Function áp dụng:** `[Tên Lambda function thật trong ứng dụng — không phải function tạo mới chỉ để làm bài]`
 
@@ -280,57 +295,40 @@ curl -v http://10.20.11.96:8000
 
 ### 7.2 Cấu hình Pattern
 
-**Nếu Reserved Concurrency:**
+**Reserved Concurrency:**
 
-![Reserved concurrency config](./images/w5-reserved-concurrency.png)
-<sub>Note: Max concurrency đã set. Giải thích tại sao function này cần giới hạn — ngăn nuốt hết account limit.</sub>
+![Reserved concurrency](./images/Reservedconcurrency.png)
 
-![Throttle metric](./images/w5-throttle-metric.png)
-<sub>Note: CloudWatch metric Throttles hoặc TooManyRequestsException khi invoke vượt limit — xác nhận behavior đang hoạt động đúng.</sub>
+**note:**
+`Usage plan có rate + burst throttling`
 
----
+![3 request same time](./images/3ReqAtTheSameTime.png)
 
-**Nếu Provisioned Concurrency:**
+**note:**
+`Usage plan có rate + burst throttling`
 
-![Provisioned concurrency config](./images/w5-provisioned-concurrency.png)
-<sub>Note: Số lượng provisioned instances và chi phí ước tính/tháng.</sub>
+![Throttle evidence](./images/Throttleevidence.png)
 
-![Cold start before](./images/w5-cold-start-before.png)
-<sub>Note: CloudWatch trace TRƯỚC — thấy Init Duration (cold start).</sub>
-
-![Cold start after](./images/w5-cold-start-after.png)
-<sub>Note: CloudWatch trace SAU — Init Duration = 0ms, xác nhận pre-warm hoạt động.</sub>
-
-**Estimated cost:** `$[X]/tháng cho [N] provisioned instances`
+**note:**
+`Usage plan có rate + burst throttling`
 
 ---
 
-**Nếu Async Invocation + DLQ:**
+**Provisioned Concurrency:**
 
-![Async DLQ config](./images/w5-async-dlq-config.png)
-<sub>Note: Lambda cấu hình invocation type Event, DLQ gắn vào (SQS hoặc SNS).</sub>
+![Cold start](./images/Cold-Start.png)
 
-![DLQ message](./images/w5-dlq-message.png)
-<sub>Note: Message rơi vào DLQ kèm chi tiết lỗi — xác nhận failed invocation được capture đúng.</sub>
+**note:**
+`Init Duration cold-start: Init Duration: 499.74 ms `
 
----
+![Warn start](./images/Warn-start.png)
 
-**Nếu S3-Event-Triggered Lambda:**
-
-![S3 event notification](./images/w5-s3-event-notification.png)
-<sub>Note: S3 PutObject event notification trên prefix đã cấu hình, trỏ tới Lambda.</sub>
-
-![Lambda cloudwatch log](./images/w5-s3-lambda-log.png)
-<sub>Note: CloudWatch log của Lambda sau khi thả file vào S3 — thấy file được đọc, field được trích xuất.</sub>
-
-![DynamoDB output row](./images/w5-dynamodb-output.png)
-<sub>Note: Row được ghi vào DynamoDB sau khi Lambda xử lý — xác nhận flow end-to-end hoạt động.</sub>
+**note:**
+`Init Duration warm-start: 0627fb6a-5157-4d11-8d56-b6b99e5ed8ef	Duration: 4130.74 ms	Billed Duration: 4131 ms	Memory Size: 256 MB	Max Memory Used: 88 MB	-> không có init duration`
 
 ---
 
 ## 8. Negative Security Tests
-
-> Ít nhất một negative test cho mỗi bổ sung W5.
 
 ### 8.1 Network / Firewall — Request bị chặn
 
