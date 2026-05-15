@@ -33,9 +33,14 @@
 
 ### 2.3 W4 Feedback Resolution
 
-**Feedback nhận được từ W4:** `[Trích dẫn 1 feedback cụ thể từ trainer tuần trước]`
+**Feedback nhận được từ W4:** `Không có related feedback`
 
-**W5 giải quyết thế nào:** `[Mô tả cụ thể đã fix/build thêm gì]`
+**W5 giải quyết thế nào:**
+  * `khác so với kiến trúc các tuần trước là áp dụng thêm 1 vpc riêng để bastion host vào hệ thống`
+  * `sử dụng thêm rds proxy để tái sử dụng connection tốt hơn, tránh exhausted connection,  db "chịu tải" tốt hơn`
+  * `sử dụng bedrock để làm chatbot dựa trên aws s3 vector và thông qua opensearch để tìm kiếm`
+  * `sử dụng aws backup để backup hệ thống`
+  * `có set-up thêm firewall endponit -> thêm 1 lớp bảo vệ hệ thống trước khi outbound lại từ nat-gateway`
 
 ---
 
@@ -109,7 +114,7 @@ curl -v http://10.20.11.96:8000
 ![Connectivity test](./images/TestConnection.png)
 
 **note:**
-`Kiểm tra kết nối thực tế từ Bastion Host (Management VPC) tới App (Prod VPC). Trạng thái HTTP 404 xác nhận lớp Network đã thông suốt (Reachability OK).`
+`Kiểm tra kết nối thực tế từ Bastion Host (Management VPC) tới App (Prod VPC). Trạng thái HTTP 200 xác nhận lớp Network đã thông suốt (Reachability OK).`
 
 **Result:**
 
@@ -122,7 +127,8 @@ curl -v http://10.20.11.96:8000
 ![Flow logs (App tier)](./images/VPCflowlog.png)
 
 **note:**
-`Flow Logs tại Prod VPC hiển thị trạng thái 'ACCEPT OK' cho lưu lượng đến từ IP 10.0.0.208 của Management VPC.`
+`Flow Logs tại Prod VPC hiển thị trạng thái 'ACCEPT OK' với action là 'accept' và log-status là 'ok' cho lưu lượng đến từ IP 10.0.0.208 của Management VPC.
+=> traffic được cho phép và log thành công`
 
 ![Flow logs (Management tier](./images/VPCflowlog2.png)
 
@@ -138,7 +144,7 @@ curl -v http://10.20.11.96:8000
 **Path đã chọn:** `Path A — AWS Network Firewall`
 
 **Rationale:**
-`Ứng dụng của nhóm có các dịch vụ chạy trong Private Subnet (ECS/Lambda) cần truy cập Internet để gọi API Bedrock và tải các thư viện cần thiết thông qua NAT Gateway. Do đó, nhóm triển khai AWS Network Firewall tại biên VPC để thực hiện kiểm tra lưu lượng (Traffic Inspection). Việc này cho phép chúng em áp dụng chính sách 'Stateful Rule' (Domain-based filtering) để chỉ cho phép traffic tới các domain hợp lệ (như .amazonaws.com), ngăn chặn rủi ro rò rỉ dữ liệu (Data Exfiltration) và chặn các kết nối tới máy chủ độc hại từ bên trong hệ thống.`
+`Ứng dụng của nhóm có các dịch vụ chạy trong Private Subnet (ECS/Lambda)cần truy cập internet để có thể gọi 1 số api bên ngoài chẳng hạn như lấy data problemset từ 1 bên thứ 3 nào đó để phục vụ enrich data cho hệ thống or tải các thư viện cần thiết thông qua NAT Gateway. Ngoài ra cũng hạn chế được các trường hợp đặc biệt như hacker cố tải malware từ bên ngoài hệ thống. Do đó, nhóm triển khai AWS Network Firewall tại biên VPC để thực hiện kiểm tra lưu lượng (Traffic Inspection). Việc này cho phép chúng em áp dụng chính sách 'Stateful Rule' (Domain-based filtering) để chỉ cho phép traffic tới các domain hợp lệ (như .amazonaws.com), ngăn chặn rủi ro rò rỉ dữ liệu (Data Exfiltration) và chặn các kết nối tới máy chủ độc hại từ bên trong hệ thống.`
 
 ---
 
