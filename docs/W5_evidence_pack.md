@@ -288,9 +288,11 @@ curl -v http://10.20.11.96:8000
 
 **Pattern:** `[ ] Reserved Concurrency` &nbsp;&nbsp; `[ ] Provisioned Concurrency`
 
-**Function áp dụng:** `[Tên Lambda function thật trong ứng dụng — không phải function tạo mới chỉ để làm bài]`
+**Function áp dụng:** `hexacode-prod-chat`
 
-**Rationale:** `[Tại sao pattern này phù hợp với function này trong ứng dụng]`
+**Rationale:** `Nhóm áp dụng chiến lược Hybrid Concurrency để tối ưu hóa cả tính an toàn và hiệu năng:
+Reserved Concurrency (Limit = 2): Đóng vai trò là 'lớp bảo vệ biên', ngăn chặn việc function này tiêu tốn quá mức hạn mức của AWS Account nếu xảy ra spike traffic đột ngột hoặc lỗi loop, đồng thời giúp kiểm soát chi phí gọi API Bedrock.
+Provisioned Concurrency (Level = 1 hoặc 2): Vì đây là tính năng Chat AI yêu cầu phản hồi tức thì, nhóm sử dụng Provisioned Concurrency để duy trì các môi trường thực thi luôn ở trạng thái 'ấm' (warm). Việc này giúp loại bỏ hoàn toàn độ trễ Cold Start (~500ms), mang lại trải nghiệm mượt mà nhất cho người dùng cuối.`
 
 ---
 
@@ -322,7 +324,7 @@ curl -v http://10.20.11.96:8000
 **note:**
 `Init Duration cold-start: Init Duration: 499.74 ms `
 
-![Warn start](./images/Warn-start.png)
+![Warm start](./images/Warm-start.png)
 
 **note:**
 `Init Duration warm-start: 0627fb6a-5157-4d11-8d56-b6b99e5ed8ef	Duration: 4130.74 ms	Billed Duration: 4131 ms	Memory Size: 256 MB	Max Memory Used: 88 MB	-> không có init duration`
