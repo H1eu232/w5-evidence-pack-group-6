@@ -194,19 +194,44 @@ curl -v http://10.20.11.96:8000
 
 ### 4.3 Request được cho phép (ACCEPT)
 
-![Request allowed](./images/w5-request-allowed.png)
+![Stateful rule group Network Firewall](./images/4.3-1_stateful-rule-groups-network-firewall.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Cấu hình Stateful Rule Group trên AWS Network Firewall để kiểm soát traffic outbound theo domain, tạo baseline cho rule allow/reject.`
+
+![Allow policy for Google](./images/4.3-2_network-firewall-allow-google.png)
+
+**note:**
+`Network Firewall policy cho phép request đến Google, chứng minh luồng traffic hợp lệ được xử lý theo rule allow.`
+
+![Curl Google successfully from EC2 behind firewall](./images/4.3-3_successfully-curl-google-from-ec2-instance-behind-firewall.png)
+
+**note:**
+`EC2 instance phía sau Firewall curl Google thành công, xác nhận request hợp lệ đi qua Network Firewall và NAT path.`
+
+![CloudWatch log Network Firewall allowed](./images/4.3-4_cloudwatch-log-network-firewall-allowed.png)
+
+**note:**
+`CloudWatch Logs ghi nhận action allowed cho traffic được phép.`
 
 ---
 
 ### 4.4 Negative Test — Request bị chặn (DENY/REJECT)
 
-![Request blocked](./images/w5-request-blocked.png)
+![Deny policy rejects Facebook](./images/4.4-1_deny-policy-settings-reject-facebook.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Cấu hình deny policy để reject request đến Facebook, thể hiện kiểm soát egress theo domain bằng Network Firewall.`
+
+![Curl Facebook rejected from EC2 behind firewall](./images/4.4-2_try-curl-facebook-from-ec2-instance-behind-firewall.png)
+
+**note:**
+`EC2 instance phía sau Firewall thử curl Facebook và bị chặn, xác nhận negative test hoạt động đúng theo rule reject.`
+
+![CloudWatch log Network Firewall rejected](./images/4.4-3_cloudwatch-log-network-firewall-rejected.png)
+
+**note:**
+`CloudWatch Logs ghi nhận action rejected cho traffic bị chặn.`
 
 ---
 
