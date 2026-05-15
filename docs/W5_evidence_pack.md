@@ -76,13 +76,6 @@
 
 ---
 
-### 2.6 Database Query vẫn hoạt động
-
-![Database query](./images/w5-db-query.png)
-<sub>Note: Query chạy được trên RDS, trả về data thật.</sub>
-
----
-
 ## 3. MH1 — Multi-VPC Connectivity
 
 ### 3.1 Lựa chọn Path
