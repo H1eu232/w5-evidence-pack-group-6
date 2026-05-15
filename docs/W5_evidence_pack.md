@@ -290,9 +290,9 @@ curl -v http://10.20.11.96:8000
 
 **Function áp dụng:** `hexacode-prod-chat`
 
-**Rationale:** `Nhóm áp dụng chiến lược Hybrid Concurrency để tối ưu hóa cả tính an toàn và hiệu năng:
-Reserved Concurrency (Limit = 2): Đóng vai trò là 'lớp bảo vệ biên', ngăn chặn việc function này tiêu tốn quá mức hạn mức của AWS Account nếu xảy ra spike traffic đột ngột hoặc lỗi loop, đồng thời giúp kiểm soát chi phí gọi API Bedrock.
-Provisioned Concurrency (Level = 1 hoặc 2): Vì đây là tính năng Chat AI yêu cầu phản hồi tức thì, nhóm sử dụng Provisioned Concurrency để duy trì các môi trường thực thi luôn ở trạng thái 'ấm' (warm). Việc này giúp loại bỏ hoàn toàn độ trễ Cold Start (~500ms), mang lại trải nghiệm mượt mà nhất cho người dùng cuối.`
+**Rationale:** `Nhóm áp dụng chiến lược Hybrid Concurrency để tối ưu hóa cả tính an toàn và hiệu năng:`<br>
+`- Reserved Concurrency (Limit = 2): Đóng vai trò là 'lớp bảo vệ biên', ngăn chặn việc function này tiêu tốn quá mức hạn mức của AWS Account nếu xảy ra spike traffic đột ngột hoặc lỗi loop, đồng thời giúp kiểm soát chi phí gọi API Bedrock.`<br>
+`- Provisioned Concurrency (Level = 1 hoặc 2): Vì đây là tính năng Chat AI yêu cầu phản hồi tức thì, nhóm sử dụng Provisioned Concurrency để duy trì các môi trường thực thi luôn ở trạng thái 'ấm' (warm). Việc này giúp loại bỏ hoàn toàn độ trễ Cold Start (~500ms), mang lại trải nghiệm mượt mà nhất cho người dùng cuối.`
 
 ---
 
