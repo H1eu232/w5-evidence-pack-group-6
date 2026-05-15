@@ -419,7 +419,9 @@ curl -v http://10.20.11.96:8000
 Chỉ điền nếu đã hoàn tất cả 5 must-haves và Evidence Pack.
 
 9.1 [ ] VPC Reachability Analyzer
--> chưa có
+![alt text](./images/911.png)
+![alt text](./images/912.png)
+![alt text](./images/913.png)
 
 9.2 [ ] Backup Vault Lock
 -> chưa có
