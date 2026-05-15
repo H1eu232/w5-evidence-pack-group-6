@@ -436,6 +436,6 @@ Chỉ điền nếu đã hoàn tất cả 5 must-haves và Evidence Pack.
 github: https://github.com/pho-veteran/hexacode/blob/main/terraform/main.tf
 
 ![alt text](./images/terraform.png)
-![alt text](image-1.png)
+![alt text](./images/image-1.png)
 
 *— End of W5 Evidence Pack —*
