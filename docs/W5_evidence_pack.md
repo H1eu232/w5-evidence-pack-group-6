@@ -20,7 +20,7 @@
 
 **Action demo:** `[e.g. User gửi câu hỏi qua chat widget → Lambda xử lý → Bedrock trả lời]`
 
-![App end-to-end](./images/w5-app-end-to-end.png)
+![alt text](./images/image.png)
 <sub>Note: Mô tả request đi qua những bước nào, kết quả trả về là gì.</sub>
 
 ---
@@ -371,7 +371,7 @@ curl -v http://10.20.11.96:8000
 **note:**
 `Init Duration cold-start: Init Duration: 499.74 ms `
 
-![Warm start](./images/Warm-start.png)
+![Warm start](./images/Warm-Start.png)
 
 **note:**
 `Init Duration warm-start: 0627fb6a-5157-4d11-8d56-b6b99e5ed8ef	Duration: 4130.74 ms	Billed Duration: 4131 ms	Memory Size: 256 MB	Max Memory Used: 88 MB	-> không có init duration`
@@ -379,14 +379,6 @@ curl -v http://10.20.11.96:8000
 ---
 
 ## 8. Negative Security Tests
-
-### 8.1 Network / Firewall — Request bị chặn
-
-*(Dùng lại ảnh từ MH2 Section 4.4)*
-
-`[Mô tả attempt: từ đâu, đến đâu, port mấy, kết quả gì]`
-
----
 
 ### 8.2 EFS — Truy cập từ instance không thuộc app-tier SG bị từ chối
 
@@ -397,55 +389,15 @@ curl -v http://10.20.11.96:8000
 
 ### 8.3 API Gateway — Unauthenticated request bị từ chối
 
-*(Dùng lại ảnh từ MH4 Section 6.5)*
+  ![Unauthenticated request denied on frontend](./images/8.3-deny-unauthorized-frontend.png)
 
-`[HTTP 403 Forbidden — API Gateway enforce auth trước khi traffic chạm Lambda]`
+  **note:**
+  `Frontend hiển thị trạng thái request không được xác thực bị từ chối, xác nhận API Gateway/Cognito enforce auth trước khi cho phép truy cập tài nguyên.`
 
----
+  ![Unauthenticated request denied log](./images/8.3-deny-unauthorized-log.png)
 
-## 9. Stretch Goals *(Tùy chọn)*
-
-> Chỉ điền nếu đã hoàn tất cả 5 must-haves và Evidence Pack.
-
-### 9.1 `[ ]` VPC Reachability Analyzer
-
-![Reachability analyzer pass](./images/w5-reachability-pass.png)
-<sub>Note: Path analysis pass — connectivity đúng.</sub>
-
-![Reachability analyzer fail](./images/w5-reachability-fail.png)
-<sub>Note: Sau khi cố ý break route table, Reachability Analyzer phát hiện được lỗi.</sub>
-
----
-
-### 9.2 `[ ]` Backup Vault Lock
-
-![Vault lock config](./images/w5-vault-lock.png)
-<sub>Note: Vault Lock ở Compliance Mode — retention period, không IAM principal nào xóa được recovery point trước khi hết hạn.</sub>
-
----
-
-### 9.3 `[ ]` Lambda Power Tuning
-
-![Power tuning result](./images/w5-power-tuning.png)
-<sub>Note: Kết quả chạy với nhiều mức memory — điểm tối ưu cost-performance là bao nhiêu MB và tại sao.</sub>
-
----
-
-### 9.4 `[ ]` API Gateway Custom Domain
-
-![Custom domain](./images/w5-custom-domain.png)
-<sub>Note: Custom domain với ACM certificate gắn vào stage API Gateway.</sub>
-
----
-
-### 9.5 `[ ]` CloudFormation Template cho một resource W5
-
-```yaml
-# Paste CFN template snippet ở đây
-```
-
-![CFN validate output](./images/w5-cfn-validate.png)
-<sub>Note: `aws cloudformation validate-template` output — template pass validation.</sub>
+  **note:**
+  `Log ghi nhận request unauthorized bị deny, cung cấp bằng chứng negative security test cho API Gateway.`
 
 ---
 
