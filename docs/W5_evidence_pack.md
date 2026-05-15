@@ -138,7 +138,7 @@ curl -v http://10.20.11.96:8000
 **Path đã chọn:** `Path A — AWS Network Firewall`
 
 **Rationale:**
-`[Nếu Path A: giải thích Lambda/EC2 nào ra internet qua NAT Gateway và tại sao cần firewall.]`
+`Ứng dụng của nhóm có các dịch vụ chạy trong Private Subnet (ECS/Lambda) cần truy cập Internet để gọi API Bedrock và tải các thư viện cần thiết thông qua NAT Gateway. Do đó, nhóm triển khai AWS Network Firewall tại biên VPC để thực hiện kiểm tra lưu lượng (Traffic Inspection). Việc này cho phép chúng em áp dụng chính sách 'Stateful Rule' (Domain-based filtering) để chỉ cho phép traffic tới các domain hợp lệ (như .amazonaws.com), ngăn chặn rủi ro rò rỉ dữ liệu (Data Exfiltration) và chặn các kết nối tới máy chủ độc hại từ bên trong hệ thống.`
 
 ---
 
@@ -188,12 +188,12 @@ curl -v http://10.20.11.96:8000
 ![Attack EFS](./images/AttackEFS.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Kiểm tra hệ thống file mount thành công (df -h) và thực hiện ghi dữ liệu cấu hình thật của ứng dụng (tour_config.txt) lên Amazon EFS từ terminal.`
 
 ![SG của mount target chỉ allow từ SG app tier](./images/EFS_mount_SG.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Hardening lớp lưu trữ: Security Group của EFS chỉ cho phép truy cập cổng 2049 từ Security Group cụ thể của tầng API Services, tuân thủ nguyên tắc Least Privilege.`
 
 ---
 
@@ -202,7 +202,7 @@ curl -v http://10.20.11.96:8000
 ![Resource Assignment](./images/ResourceAssignment.png)
 
 **note:**
-`Nhóm dùng ECS Fargate là Serverless nên không có EBS`
+`Cấu hình Backup Plan tự động nhận diện tài nguyên dựa trên ARN prefix, bao phủ toàn bộ hệ thống File System và Database của ứng dụng.`
 
 ---
 
@@ -211,12 +211,12 @@ curl -v http://10.20.11.96:8000
 ![Schedule](./images/Schedule.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Thiết lập chính sách sao lưu hàng ngày (Daily) với thời gian lưu trữ 7 ngày, đảm bảo khả năng phục hồi dữ liệu trong vòng 1 tuần.`
 
 ![Recovery Point](./images/RecoveryPoint.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Hệ thống đã tạo thành công điểm khôi phục (Recovery Point) cho Prod-EFS, xác nhận dữ liệu đã được lưu trữ an toàn vào Backup Vault.`
 
 ---
 
@@ -230,13 +230,14 @@ curl -v http://10.20.11.96:8000
 ![Trigger Restore](./images/TriggerRestore.png)
 
 **note:**
-`Quan sát và giám sát toàn bộ traffic đi ra từ Bastion Host, đáp ứng yêu cầu tính quan sát (Observability) của Network Fortress.`
+`Bằng chứng quan trọng nhất: Restore Job ID [3c5d3...] đã hoàn thành trạng thái 'Completed', chứng minh kế hoạch khôi phục hoạt động thực tế.`
 
 ![Mount EFS from back up](./images/MountEFSfromBackup2.png)
 ![Mount EFS from back up](./images/MountEFSfromBackup2.png)
 
-**note:**
-`Mount EFS mới từ Backup → không có file Noise_testing + còn các data cũ`
+**note:**<br>
+`- Thực hiện mount File System vừa được khôi phục vào thư mục efs_restore để đối soát dữ liệu gốc.`<br>
+`- Lệnh cat cho thấy nội dung file sau khi khôi phục hoàn toàn trùng khớp với dữ liệu gốc. Restore Test thành công 100%.`
 
 ---
 
@@ -247,7 +248,7 @@ curl -v http://10.20.11.96:8000
 ![Usage Plan + Throttling](./images/UsagePlan.png)
 
 **note:**
-`Usage plan có rate + burst throttling`
+`Thiết lập Usage Plan với Rate Limit 1 requests/giây để bảo vệ tài nguyên Lambda bên dưới khỏi các đợt bùng phát traffic (Spike traffic).`
 
 ---
 
@@ -258,7 +259,7 @@ curl -v http://10.20.11.96:8000
 ![Auth config](./images/AuthenticatewithCognito.png)
 
 **note:**
-`Người dùng đăng nhập thành công vào hệ thống Hexacode thông qua Cognito User Pool để lấy Identity Token.`
+`Surface API bảo mật: Tích hợp Cognito Authorizer yêu cầu JWT Token hợp lệ cho mọi request tới endpoint /api/chat/messages.`
 
 ---
 
@@ -267,7 +268,7 @@ curl -v http://10.20.11.96:8000
 ![Before login](./images/Notlogin.png)
 
 **note:**
-`Usage plan có rate + burst throttling`
+`Kiểm chứng bảo mật: Khi truy cập từ trình duyệt mà không có Token hợp lệ, API Gateway trả về lỗi 401 Unauthorized, chặn đứng truy cập trái phép tại biên.`
 
 ---
 
@@ -277,7 +278,7 @@ curl -v http://10.20.11.96:8000
 ![After login](./images/Login2.png)
 
 **note:**
-`Usage plan có rate + burst throttling`
+`Giao diện sau khi login thành công.`
 
 ---
 
@@ -300,17 +301,17 @@ curl -v http://10.20.11.96:8000
 ![Reserved concurrency](./images/Reservedconcurrency.png)
 
 **note:**
-`Usage plan có rate + burst throttling`
+`Nhóm thiết lập Reserved Concurrency cho Lambda function hexacode-prod-chat ở mức bằng 2. Cấu hình này nhằm giới hạn số lượng thực thi đồng thời, giúp bảo vệ hạn mức (account limit) và mô phỏng hành vi giới hạn tải trong môi trường Production.`
 
 ![3 request same time](./images/3ReqAtTheSameTime.png)
 
 **note:**
-`Usage plan có rate + burst throttling`
+`Thực hiện stress test bằng cách gửi 3 request đồng thời. Kết quả: 2 request đầu được xử lý thành công, request thứ 3 nhận lỗi "Service Unavailable" do vượt quá giới hạn thực thi đồng thời đã cấu hình. Đây là bằng chứng cơ chế chặn tải (Throttling) hoạt động chính xác.`
 
 ![Throttle evidence](./images/Throttleevidence.png)
 
 **note:**
-`Usage plan có rate + burst throttling`
+`Biểu đồ CloudWatch ghi nhận rõ ràng các điểm Spike của metric 'Throttles' (cột màu xanh/cam). Điều này xác nhận hệ thống đã chủ động từ chối các request vượt ngưỡng để đảm bảo tính ổn định cho các thành phần khác.`
 
 ---
 
