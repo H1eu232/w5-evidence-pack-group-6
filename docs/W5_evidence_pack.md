@@ -9,7 +9,7 @@
 |---|---|
 | **Group Number** | Group 6 |
 | **Member Names** | Minh Tuấn · Thành Vinh · Anh Hoàng · Hoàng Nhân · Mạnh Khang · Ngọc Thắng · Hoàng Thông · Thành Tâm |
-| **W5 Repo** | `[[GitHub G6 repo URL]](https://github.com/H1eu232/w5-evidence-pack-group-6.git)` |
+| **W5 Repo** | [GitHub G6 repo URL](https://github.com/H1eu232/w5-evidence-pack-group-6.git) |
 
 
 ---
